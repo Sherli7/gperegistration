@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de préinscription</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+<body>
+    <!-- Conteneur principal -->
+    <div class="container">
+        <img src="./img/logo.png" width="600" height="400" alt="Logo GPE" class="responsive-img">
+        <header>Préinscription</header>
+        <!-- Formulaire -->
+        <form id="registrationForm">
+            <div class="form first">
+                <div class="details personal">
+                    <span class="title">Information personnelle</span>
+                    <div class="fields">
+                        <div class="input-field">
+                            <label>Nom <span style="color: red;">*</span></label>
+                            <input type="text" name="nom" placeholder="Votre nom" required>
+                        </div>
+                        <div class="input-field">
+                            <label>Prénom</label>
+                            <input type="text" name="prenom" placeholder="Votre prénom" required>
+                        </div>
+                        <div class="input-field">
+                            <label>Email <span style="color: red;">*</span></label>
+                            <input type="email" name="email" placeholder="Entrez votre email" required
+                                   title="Veuillez entrer un email valide (ex: nom@domaine.com)">
+                        </div>
+                        <div class="input-field">
+                            <label>Tél <span style="color: red;">*</span></label>
+                            <input type="number" name="tel" placeholder="ex: +237 " id="telInput" required>
+                        </div>                        
+                        <div class="input-field">
+                            <label>Sexe <span style="color: red;">*</span></label>
+                            <select name="sexe" required>
+                                <option disabled selected>Votre sexe</option>
+                                <option value="Homme">Homme</option>
+                                <option value="Femme">Femme</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-field">
+                            <label>Date de naissance <span style="color: red;">*</span></label>
+                            <input type="date" name="birthday" required>
+                        </div>
+                        <div class="input-field">
+                            <label>Formation / produit qui vous intéresse<span style="color: red;">*</span></label>
+                            <select name="formation_interessee" required>
+                                <option disabled selected>Sélectionnez une formation</option>
+                                <!-- Formations diplômantes -->
+                                <optgroup label="Formations diplômantes">
+                                    <option value="Master en Gestion de la Politique Économique">Master en Gestion de la Politique Économique</option>
+                                    <option value="Master en Data, Economics and Development Policy">Master en Data, Economics and Development Policy</option>
+                                </optgroup>
+                                <!-- Formations continues -->
+                                <optgroup label="Formations continues">
+                                    <option value="Formation en gestion de la dette">Formation en gestion de la dette</option>
+                                    <option value="Formation en optimisation budgétaire">Formation en optimisation budgétaire</option>
+                                    <option value="Formation en optimisation des recettes non fiscales">Formation en optimisation des recettes non fiscales</option>
+                                    <option value="Formation en Gestion budgétaire">Formation en Gestion budgétaire</option>
+                                    <option value="Formation en planification du développement">Formation en planification du développement</option>
+                                    <option value="Formation en suivi et évaluation des projets, programme et politiques publiques">Formation en suivi et évaluation des projets, programme et politiques publiques</option>
+                                    <option value="Formation en usage statistiques et prise de décision">Formation en usage statistiques et prise de décision</option>
+                                    <option value="Formation en prévision et durabilité">Formation en prévision et durabilité</option>
+                                    <option value="Formation en analyse des données et intelligence artificielle">Formation en analyse des données et intelligence artificielle</option>
+                                </optgroup>
+                                <!-- Autres options -->
+                                <optgroup label="Autres">
+                                    <option value="Formation à la carte">Formation à la carte</option>
+                                    <option value="Conférence thématique">Conférence thématique</option>
+                                    <option value="Grands débats économique">Grands débats économique</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="input-field">
+                            <label>Sinon spécifiez (Pas obligatoire)</label>
+                            <input type="text" name="autreformation" placeholder="Autre formation/produit">
+                        </div>
+                        <div class="input-field">
+                            <label>Années d’expérience<span style="color: red;">*</span></label>
+                            <select name="experience_years" required>
+                                <option disabled selected>Nombre d’années d’expérience</option>
+                                <option value="Moins de 1 an">Moins de 1 an</option>
+                                <option value="De 1 à 5 ans">De 1 à 5 ans</option>
+                                <option value="De 5 à 10 ans">De 5 à 10 ans</option>
+                                <option value="+ 10 ans">+ 10 ans</option>
+                            </select>                            
+                        </div>
+                        <div class="input-field">
+                            <label>Entreprise/Institution actuelle <span style="color: red;">*</span></label>
+                            <input type="text" name="institution" placeholder="ex: corddex soft" required>
+                        </div>
+                        <div class="input-field">
+                            <label>Nationalité<span style="color: red;">*</span></label>
+                            <input type="text" name="nationalite" placeholder="Votre nationalité" required>
+                        </div>
+                        <div class="input-field">
+                            <label>Pays de résidence <span style="color: red;">*</span></label>
+                            <input type="text" name="pays_residence" placeholder="Votre pays">
+                        </div>
+                        <div class="input-field">
+                            <label>Langue parlée <span style="color: red;">*</span></label>
+                            <select name="langue" required>
+                                <option disabled selected>Langue parlée</option>
+                                <option value="Anglais">Anglais</option>
+                                <option value="Français">Français</option>
+                                <option value="Bilingue">Bilingue</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                </div>
+                <button class="prime" type="submit" id="submitBtn">
+                    <span class="btnText">Valider</span>
+                    <i class="uil uil-navigator"></i>
+                </button>
+            </div>
+            
+            <!-- Loader -->
+            <div id="loaderContainer" class="hidden">
+                <div class="loader"></div>
+                <p>Envoi en cours...</p>
+            </div>
+
+            <!-- Message de confirmation -->
+            <div id="confirmationMessage" class=""></div>
+                </form>
+            </div>
+    <!-- Inclusion du script -->
+    <script src="./script.js" defer></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</body>
+</html>
+

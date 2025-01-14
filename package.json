@@ -1,0 +1,21 @@
+{
+  "name": "dgconference",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "dgconference": "file:",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.1",
+    "nodemailer": "^6.9.15",
+    "pg": "^8.13.0",
+    "toastify-js": "^1.12.0"
+  }
+}
