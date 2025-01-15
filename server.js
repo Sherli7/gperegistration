@@ -87,6 +87,7 @@ const client = new Client({
             date_naissance DATE,
             experience_years VARCHAR(20),
             entreprise VARCHAR(100),
+            statut_fonction (50),
             nationalite VARCHAR(50),
             pays_residence VARCHAR(50),
             langue_parlee VARCHAR(20),
@@ -222,7 +223,7 @@ app.post('/submit', async (req, res) => {
               <div class="email-container">
                 <!-- Header -->
                 <div class="header">
-                  <img src="https://trainingpe.edocsflow.com/img/logo.png" alt="Logo GPE">
+                  <img src="https://trainingpe.edocsflow.com/img/logo blanc.jpg" alt="Logo GPE">
                   <h1>Confirmation de Réservation</h1>
                 </div>
                 <!-- Content -->
