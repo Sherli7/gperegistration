@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
     <!-- Conteneur principal -->
@@ -47,40 +48,7 @@
                         
                         <div class="input-field">
                             <label>Date de naissance <span style="color: red;">*</span></label>
-                            <input type="date" name="birthday" required>
-                        </div>
-                        <div class="input-field">
-                            <label>Formation / produit qui vous intéresse<span style="color: red;">*</span></label>
-                            <select name="formation_interessee" required>
-                                <option disabled selected>Sélectionnez une formation</option>
-                                <!-- Formations diplômantes -->
-                                <optgroup label="Formations diplômantes">
-                                    <option value="Master en Gestion de la Politique Économique">Master en Gestion de la Politique Économique</option>
-                                    <option value="Master en Data, Economics and Development Policy">Master en Data, Economics and Development Policy</option>
-                                </optgroup>
-                                <!-- Formations continues -->
-                                <optgroup label="Formations continues">
-                                    <option value="Formation en gestion de la dette">Formation en gestion de la dette</option>
-                                    <option value="Formation en optimisation budgétaire">Formation en optimisation budgétaire</option>
-                                    <option value="Formation en optimisation des recettes non fiscales">Formation en optimisation des recettes non fiscales</option>
-                                    <option value="Formation en Gestion budgétaire">Formation en Gestion budgétaire</option>
-                                    <option value="Formation en planification du développement">Formation en planification du développement</option>
-                                    <option value="Formation en suivi et évaluation des projets, programme et politiques publiques">Formation en suivi et évaluation des projets, programme et politiques publiques</option>
-                                    <option value="Formation en usage statistiques et prise de décision">Formation en usage statistiques et prise de décision</option>
-                                    <option value="Formation en prévision et durabilité">Formation en prévision et durabilité</option>
-                                    <option value="Formation en analyse des données et intelligence artificielle">Formation en analyse des données et intelligence artificielle</option>
-                                </optgroup>
-                                <!-- Autres options -->
-                                <optgroup label="Autres">
-                                    <option value="Formation à la carte">Formation à la carte</option>
-                                    <option value="Conférence thématique">Conférence thématique</option>
-                                    <option value="Grands débats économique">Grands débats économique</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                        <div class="input-field">
-                            <label>Sinon spécifiez (Pas obligatoire)</label>
-                            <input type="text" name="autreformation" placeholder="Autre formation/produit">
+                            <input type="date" id="birthday-input" name="birthday" required>
                         </div>
                         <div class="input-field">
                             <label>Années d’expérience<span style="color: red;">*</span></label>
@@ -93,8 +61,12 @@
                             </select>                            
                         </div>
                         <div class="input-field">
-                            <label>Entreprise/Institution actuelle <span style="color: red;">*</span></label>
-                            <input type="text" name="institution" placeholder="ex: corddex soft" required>
+                            <label>organisation/Institution actuelle <span style="color: red;">*</span></label>
+                            <input type="text" name="organisation" placeholder="ex:GPE CAMEROUN" required>
+                        </div>
+                        <div class="input-field">
+                            <label>Votre statut/fonction<span style="color: red;">*</span></label>
+                            <input type="text" name="statut_fonction" placeholder="Votre statut ou fonction" required>
                         </div>
                         <div class="input-field">
                             <label>Nationalité<span style="color: red;">*</span></label>
@@ -113,8 +85,113 @@
                                 <option value="Bilingue">Bilingue</option>
                             </select>
                         </div>
+                            <div class="select-btn">
+                                <span class="btn-text">Veuillez choisir votre rubrique <label>Langue parlée <span style="color: red;">*</span></span>
+                                <span class="arrow-dwn">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </span>
+                            </div>
+                
+                            <ul class="list-items">                           
+                                <span class="themee">Formations continues</span>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Analyse de données axée intelligence artificielle</span>
+                                </li>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Formation en gestion de la dette</span>
+                                </li>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Formation en optimisation budgétaire</span>
+                                </li>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Formation en optimisation des recettes non fiscales</span>
+                                </li>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Formation en Gestion budgétaire</span>
+                                </li>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Formation en planification du développement</span>
+                                </li>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Formation en suivi et évaluation des projets, programme et politiques publiques</span>
+                                </li>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Formation en usage statistiques et prise de décision</span>
+                                </li>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Formation en prévision et durabilité</span>
+                                </li>      
+
+                                <span class="themee">Formations diplômantes</span>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Master en Gestion de la Politique Économique</span>
+                                </li>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Master en Data, Economics and Development Policy</span>
+                                </li>
+
+                                <span class="themee">Formation à la carte</span>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Formation à la carte et université d'été</span>
+                                </li>
+
+                                <span class="themee">Conférences</span>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Conférence thématique</span>
+                                </li>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Conférences de grands débats économiques</span>
+                                </li>
+                                <li class="item">
+                                    <span class="checkbox">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </span>
+                                    <span class="item-text">Séminaires hautes personnalités</span>
+                                </li>
+                            </ul>
                     </div>
-                    
                 </div>
                 <button class="prime" type="submit" id="submitBtn">
                     <span class="btnText">Valider</span>
@@ -135,6 +212,7 @@
     <!-- Inclusion du script -->
     <script src="./script.js" defer></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 </body>
 </html>
 

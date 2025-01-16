@@ -1,152 +1,160 @@
+// Ajout du style pour les toasts
+const style = document.createElement('style');
+style.innerHTML = `
+.toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+    max-width: 400px;
+}
+.toast {
+    background-color: #333;
+    color: #fff;
+    padding: 15px 20px;
+    margin-top: 10px;
+    border-radius: 5px;
+    opacity: 0.9;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: opacity 0.5s ease-in-out;
+    text-align: center;
+}
+.toast.success { background-color: #28a745; }
+.toast.error { background-color: #dc3545; }
+.hidden {
+    display: none !important;
+}`;
+document.head.appendChild(style);
 
-// Fonction pour valider l'email
+// Création du conteneur des toasts
+const toastContainer = document.createElement('div');
+toastContainer.className = 'toast-container';
+document.body.appendChild(toastContainer);
+
+// Fonction pour afficher un toast
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerText = message;
+    toastContainer.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+// Fonction pour afficher/cacher le loader
+function toggleLoader(show) {
+    const loaderContainer = document.getElementById('loaderContainer');
+    if (show) {
+        loaderContainer.classList.remove('hidden');
+    } else {
+        loaderContainer.classList.add('hidden');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const dateInput = document.getElementById('birthday-input');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('max', today);
+});
+
 function isMailSyntaxValid(email) {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
 }
 
-// Fonction pour gérer la soumission du formulaire
-// Fonction pour gérer la soumission du formulaire
-function submitForm(event) {
-    event.preventDefault(); // Empêche le rechargement de la page
+function validateTel(tel) {
+    const telRegex = /^\d+$/;
+    return telRegex.test(tel);
+}
 
-        // Désactiver le bouton
-        submitBtn.classList.add('disabled');
-        // Afficher le loader
-        const loaderContainer = document.getElementById('loaderContainer');
-        loaderContainer.classList.remove('hidden');
-    // Récupérer le formulaire et ses données
+const telInput = document.getElementById('telInput');
+telInput.addEventListener('input', function() {
+    const telValue = telInput.value.trim();
+    if (!validateTel(telValue)) {
+        telInput.value = telValue.replace(/\D+/g, '');
+    }
+});
+
+async function submitForm(event) {
+    event.preventDefault();
+    toggleLoader(true);
     const form = document.getElementById('registrationForm');
     const formData = new FormData(form);
-
-    // Construire l'objet de données à envoyer au serveur
     const data = {
         nom: formData.get('nom'),
         prenom: formData.get('prenom'),
         email: formData.get('email'),
         tel: formData.get('tel'),
         sexe: formData.get('sexe'),
-        date_naissance: formData.get('birthday'), // Date de naissance
-        experience_years: formData.get('experience_years'), // Expérience en années
-        entreprise: formData.get('institution'), // Institution
+        date_naissance: formData.get('birthday'),
+        experience_years: formData.get('experience_years'),
+        organisation: formData.get('organisation'),
         nationalite: formData.get('nationalite'),
-        pays_residence: formData.get('pays_residence'), // Pays de résidence
-        langue_parlee: formData.get('langue'), // Langue parlée
-        autreformation: formData.get('autreformation'), // Autre formation
-        formation_interessee:formData.get('formation_interessee'), //
+        pays_residence: formData.get('pays_residence'),
+        langue_parlee: formData.get('langue'),
+        statut_fonction: formData.get('statut_fonction'),
+        rubrique_formation: Array.from(document.querySelectorAll('.item.checked .item-text')).map(el => el.innerText)
     };
 
-// Sélectionner le champ téléphone
-const telInput = document.getElementById('telInput');
-
-// Fonction pour vérifier si le téléphone ne contient que des nombres
-function validateTel(tel) {
-    const telRegex = /^\d+$/;
-    return telRegex.test(tel);
-}
-
-// Écouter les événements de saisie dans le champ téléphone
-telInput.addEventListener('input', function() {
-    const telValue = telInput.value.trim();
-    if (!validateTel(telValue)) {
-        // Supprimer les caractères non numériques
-        telInput.value = telValue.replace(/\D+/g, '');
-    }
-});
-
-
-
-    // Vérification des champs obligatoires
-    let missingFields = [];
-
+    const missingFields = [];
     if (!data.nom) missingFields.push('Nom');
     if (!data.email || !isMailSyntaxValid(data.email)) missingFields.push('Email (format invalide)');
-    if (!data.tel) missingFields.push('Téléphone');
+    if (!data.tel || !validateTel(data.tel)) missingFields.push('Téléphone');
     if (!data.sexe) missingFields.push('Sexe');
     if (!data.date_naissance) missingFields.push('Date de naissance');
     if (!data.experience_years) missingFields.push("Nombre d'années d'expérience");
-    if (!data.entreprise) missingFields.push("Entreprise/Institution actuelle");
+    if (!data.organisation) missingFields.push("Organisation/Institution actuelle");
     if (!data.nationalite) missingFields.push('Nationalité');
-    if (!data.pays_residence) missingFields.push('Pays de résidence');
-    if (!data.langue_parlee) missingFields.push('Langue parlée');
-    if (!data.formation_interessee) missingFields.push('formation interessée');
 
     if (missingFields.length > 0) {
-        alert(`Veuillez remplir les champs suivants correctement :\n- ${missingFields.join('\n- ')}`);
+        toggleLoader(false);
+        showToast(`Veuillez remplir les champs suivants :\n- ${missingFields.join('\n- ')}`, 'error');
         return;
     }
 
-    // Masquer le message de confirmation (s'il existe)
-    const confirmationMessage = document.getElementById('confirmationMessage');
-    confirmationMessage.classList.add('hidden');
-
-    // Envoi des données au serveur
-    fetch('/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-    })
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then((result) => {
-        if (result.success) {
-            Toastify({
-                text: 'Inscription réussie !',
-                duration: 3000,
-                newWindow: true,
-                close: true,
-                gravity: 'top', // `top` or `bottom`
-                position: 'center', // `left`, `center` or `right`
-                backgroundColor: "#4CAF50",
-                stopOnFocus: true // Prevents dismissing of toast on hover
-            }).showToast();
-            form.reset();
-        } else {
-            Toastify({
-                text: `Erreur : ${result.message}`,
-                duration: 3000,
-                newWindow: true,
-                close: true,
-                gravity: 'top', // `top` or `bottom`
-                position: 'center', // `left`, `center` or `right`
-                backgroundColor: "#FF9800",
-                stopOnFocus: true // Prevents dismissing of toast on hover
-            }).showToast();
-        }
-    })
-.catch((error) => {
-    Toastify({
-        text: 'Erreur lors de l\'inscription.',
-        duration: 3000,
-        newWindow: true,
-        close: true,
-        gravity: 'top', // `top` or `bottom`
-        position: 'center', // `left`, `center` or `right`
-        backgroundColor: "#FF9800",
-        stopOnFocus: true // Prevents dismissing of toast on hover
-    }).showToast();
-})
-.finally(() => {
-        // Masquer le loader après l'envoi ou en cas d'erreur
-        loaderContainer.classList.add('hidden');
-});
-
+    try {
+        const response = await fetch('/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) throw new Error(`Erreur du serveur : ${response.statusText}`);
+        showToast('Formulaire soumis avec succès !', 'success');
+        form.reset(); // Réinitialiser les champs du formulaire
+        document.querySelectorAll('.item.checked').forEach(item => item.classList.remove('checked'));
+        document.querySelector('.btn-text').innerText = "Veuillez choisir votre rubrique";
+    } catch (error) {
+        showToast('Une erreur est survenue. Veuillez réessayer plus tard.', 'error');
+    } finally {
+        toggleLoader(false);
+    }
 }
 
-
-
-// Gestion de l'événement "submit" du formulaire
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('registrationForm');
-    form.addEventListener('submit', submitForm);
+const selectBtn = document.querySelector(".select-btn"),
+      items = document.querySelectorAll(".item");
+selectBtn.addEventListener("click", () => {
+    selectBtn.classList.toggle("open");
 });
+items.forEach(item => {
+    item.addEventListener("click", () => {
+        item.classList.toggle("checked");
+        let checked = document.querySelectorAll(".checked"),
+            btnText = document.querySelector(".btn-text");
+            if(checked && checked.length > 0){
+                btnText.innerText = `${checked.length} Selected`;
+            }else{
+                btnText.innerText = "Select Language";
+            }
+    });
+})
 
-// Gestion de l'événement "submit" du formulaire
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('registrationForm');
-    form.addEventListener('submit', submitForm);
-});
+document.getElementById('registrationForm').addEventListener('submit', submitForm);
