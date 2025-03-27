@@ -3,216 +3,641 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulaire de préinscription</title>
+    <title>Formulaire de Préinscription</title>
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+
+    /* ===== Global Styles ===== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+        background-color: #f5f5f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+    
+    .container {
+        background: #fff;
+        padding: 20px 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 900px;
+        width: 100%;
+    }
+    
+    /* ===== Header Styling ===== */
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        margin-bottom: 20px;
+        background: linear-gradient(to left, #042E68, #37A700);
+        padding: 15px 0;
+        border-radius: 10px;
+    }
+    
+    header img {
+        width: 80px;
+        height: auto;
+        margin-bottom: 10px;
+    }
+    
+    header h1 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #fff;
+        text-align: center;
+    }
+    
+    /* ===== Form Styling ===== */
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .input-field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .input-field label {
+        font-weight: bold;
+        color: #495057;
+    }
+    
+    .input-field input,
+    .input-field select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+    
+    /* ===== Submit Button ===== */
+    .btn {
+        background: #042E68;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 200px;
+        margin: 0 auto;
+    }
+    
+    .btn:hover {
+        background: #0056b3;
+    }
+    
+    /* ===== Loader Animation ===== */
+    #loader {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+    }
+    
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border: 6px solid #fff;
+        border-top: 6px solid #042E68;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* ===== Dropdown Styling ===== */
+    .dropdown-container {
+        margin-top: 20px;
+    }
+    
+    .dropdown-title {
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 10px;
+        background: #007bff;
+        color: white;
+        border-radius: 5px;
+        text-align: center;
+    }
+    
+    .dropdown-content {
+        display: none;
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    /* ===== Table Styling (Responsive) ===== */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        min-width: 100%;
+    }
+    
+    table th, table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+    
+    table th {
+        background: #007bff;
+        color: white;
+    }
+    
+    /* ===== Ajustement des largeurs de colonnes ===== */
+    table th:nth-child(1), table td:nth-child(1) {
+        width: 10%;
+        text-align: center;
+    }
+    
+    table th:nth-child(2), table td:nth-child(2) {
+        width: 40%;
+    }
+    
+    table th:nth-child(3), table td:nth-child(3) {
+        width: 25%;
+    }
+    
+    table th:nth-child(4), table td:nth-child(4) {
+        width: 25%;
+    }
+    
+    /* ===== Ajustement spécifique sur mobile ===== */
+    @media (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+    
+        header h1 {
+            font-size: 20px;
+        }
+    
+        .btn {
+            font-size: 14px;
+            width: 150px;
+        }
+    
+        .table-responsive {
+            display: block;
+            overflow-x: auto;
+        }
+    
+        table {
+            min-width: 750px;
+        }
+    
+        table th, table td {
+            padding: 8px;
+            font-size: 14px;
+        }
+    }
+     
+</style>
 <body>
-    <!-- Conteneur principal -->
     <div class="container">
-        <img src="./img/logo.png" width="600" height="400" alt="Logo GPE" class="responsive-img">
-        <header>Préinscription</header>
-        <!-- Formulaire -->
+        <header>
+            <img src="/images/logo.png" alt="Logo"> <!-- Remplacez l'URL par celle de votre logo -->
+            <h1>Formulaire de Préinscription</h1>
+        </header>
         <form id="registrationForm">
-            <div class="form first">
-                <div class="details personal">
-                    <span class="title">Information personnelle</span>
-                    <div class="fields">
-                        <div class="input-field">
-                            <label>Nom <span style="color: red;">*</span></label>
-                            <input type="text" name="nom" placeholder="Votre nom" required>
-                        </div>
-                        <div class="input-field">
-                            <label>Prénom</label>
-                            <input type="text" name="prenom" placeholder="Votre prénom" required>
-                        </div>
-                        <div class="input-field">
-                            <label>Email <span style="color: red;">*</span></label>
-                            <input type="email" name="email" placeholder="Entrez votre email" required
-                                   title="Veuillez entrer un email valide (ex: nom@domaine.com)">
-                        </div>
-                        <div class="input-field">
-                            <label>Tél <span style="color: red;">*</span></label>
-                            <input type="number" name="tel" placeholder="ex: +237 " id="telInput" required>
-                        </div>                        
-                        <div class="input-field">
-                            <label>Sexe <span style="color: red;">*</span></label>
-                            <select name="sexe" required>
-                                <option disabled selected>Votre sexe</option>
-                                <option value="Homme">Homme</option>
-                                <option value="Femme">Femme</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-field">
-                            <label>Date de naissance <span style="color: red;">*</span></label>
-                            <input type="date" id="birthday-input" name="birthday" required>
-                        </div>
-                        <div class="input-field">
-                            <label>Années d’expérience<span style="color: red;">*</span></label>
-                            <select name="experience_years" required>
-                                <option disabled selected>Nombre d’années d’expérience</option>
-                                <option value="Moins de 1 an">Moins de 1 an</option>
-                                <option value="De 1 à 5 ans">De 1 à 5 ans</option>
-                                <option value="De 5 à 10 ans">De 5 à 10 ans</option>
-                                <option value="+ 10 ans">+ 10 ans</option>
-                            </select>                            
-                        </div>
-                        <div class="input-field">
-                            <label>organisation/Institution actuelle <span style="color: red;">*</span></label>
-                            <input type="text" name="organisation" placeholder="ex:GPE CAMEROUN" required>
-                        </div>
-                        <div class="input-field">
-                            <label>Votre statut/fonction<span style="color: red;">*</span></label>
-                            <input type="text" name="statut_fonction" placeholder="Votre statut ou fonction" required>
-                        </div>
-                        <div class="input-field">
-                            <label>Nationalité<span style="color: red;">*</span></label>
-                            <input type="text" name="nationalite" placeholder="Votre nationalité" required>
-                        </div>
-                        <div class="input-field">
-                            <label>Pays de résidence <span style="color: red;">*</span></label>
-                            <input type="text" name="pays_residence" placeholder="Votre pays">
-                        </div>
-                        <div class="input-field">
-                            <label>Langue parlée <span style="color: red;">*</span></label>
-                            <select name="langue" required>
-                                <option disabled selected>Langue parlée</option>
-                                <option value="Anglais">Anglais</option>
-                                <option value="Français">Français</option>
-                                <option value="Bilingue">Bilingue</option>
-                            </select>
-                        </div>
-                            <div class="select-btn">
-                                <span class="btn-text">Veuillez choisir votre rubrique <label>Langue parlée <span style="color: red;">*</span></span>
-                                <span class="arrow-dwn">
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </span>
-                            </div>
-                
-                            <ul class="list-items">                           
-                                <span class="themee">Formations continues</span>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Analyse de données axée intelligence artificielle</span>
-                                </li>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Formation en gestion de la dette</span>
-                                </li>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Formation en optimisation budgétaire</span>
-                                </li>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Formation en optimisation des recettes non fiscales</span>
-                                </li>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Formation en Gestion budgétaire</span>
-                                </li>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Formation en planification du développement</span>
-                                </li>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Formation en suivi et évaluation des projets, programme et politiques publiques</span>
-                                </li>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Formation en usage statistiques et prise de décision</span>
-                                </li>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Formation en prévision et durabilité</span>
-                                </li>      
+            <!-- Champs obligatoires -->
+            <div class="input-field">
+                <label>Nom *</label>
+                <input type="text" name="nom" placeholder="Votre nom" required>
+            </div>
+            <div class="input-field">
+                <label>Prénom *</label>
+                <input type="text" name="prenom" placeholder="Votre prénom" required>
+            </div>
+            <div class="input-field">
+                <label>Email *</label>
+                <input type="email" name="email" placeholder="Votre email" required>
+            </div>
+            <div class="input-field">
+                <label>Téléphone *</label>
+                <input type="text" name="tel" placeholder="Votre téléphone" required>
+            </div>
+            <div class="input-field">
+                <label>Sexe *</label>
+                <select name="sexe" required>
+                    <option value="" disabled selected>Votre sexe</option>
+                    <option value="Homme">Homme</option>
+                    <option value="Femme">Femme</option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label>Date de naissance *</label>
+                <input type="date" name="birthday" id="birthday" required>
+            </div>
+            <div class="input-field">
+                <label>Années d'expérience *</label>
+                <select name="experience_years" required>
+                    <option value="" disabled selected>Votre expérience</option>
+                    <option value="Moins de 1 an">Moins de 1 an</option>
+                    <option value="1 à 5 ans">1 à 5 ans</option>
+                    <option value="5 à 10 ans">5 à 10 ans</option>
+                    <option value="+10 ans">+10 ans</option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label>Organisation / Entreprise *</label>
+                <input type="text" id="organisation" name="organisation" placeholder="Votre organisation" required>
+            </div>
+            <div class="input-field">
+                <label>Fonction actuelle *</label>
+                <input type="text" id="statut" name="statut" placeholder="Votre fonction actuelle" required>
+            </div>
 
-                                <span class="themee">Formations diplômantes</span>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Master en Gestion de la Politique Économique</span>
-                                </li>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Master en Data, Economics and Development Policy</span>
-                                </li>
-
-                                <span class="themee">Formation à la carte</span>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Formation à la carte et université d'été</span>
-                                </li>
-
-                                <span class="themee">Conférences</span>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Conférence thématique</span>
-                                </li>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Conférences de grands débats économiques</span>
-                                </li>
-                                <li class="item">
-                                    <span class="checkbox">
-                                        <i class="fa-solid fa-check check-icon"></i>
-                                    </span>
-                                    <span class="item-text">Séminaires hautes personnalités</span>
-                                </li>
-                            </ul>
+            <div class="input-field">
+                <label>Nationalité *</label>
+                <input type="text" name="nationalite" placeholder="Votre nationalité" required>
+            </div>
+            <div class="input-field autocomplete" style="width: 100%;">
+                <label for="pays_residence">Pays de résidence *</label>
+                <input id="pays_residence" type="text" name="pays_residence" placeholder="Votre pays de résidence" required>
+            </div>
+            <div class="input-field">
+                <label>Langue parlée *</label>
+                <select name="langue" required>
+                    <option value="" disabled selected>Votre langue parlée</option>
+                    <option value="Français">Français</option>
+                    <option value="Anglais">Anglais</option>
+                    <option value="Bilingue">Bilingue</option>
+                </select>
+            </div>
+            <!-- Liste déroulante -->
+            <div class="dropdown-container">
+                <div class="dropdown-title" onclick="toggleDropdown('generalFormationsDropdown')">Formations générales * <i>&#x25BC;</i></div>
+                <div class="dropdown-content" id="generalFormationsDropdown">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sélection</th>
+                                    <th>Formation</th>
+                                    <th style="display: none;">ID</th> <!-- Colonne ID cachée -->
+                                </tr>
+                            </thead>
+                            <tbody id="generalFormationsTable"></tbody>
+                        </table>
                     </div>
                 </div>
-                <button class="prime" type="submit" id="submitBtn">
-                    <span class="btnText">Valider</span>
-                    <i class="uil uil-navigator"></i>
-                </button>
             </div>
             
-            <!-- Loader -->
-            <div id="loaderContainer" class="hidden">
-                <div class="loader"></div>
-                <p>Envoi en cours...</p>
+            <div class="dropdown-container">
+                <div class="dropdown-title" onclick="toggleDropdown('conferenceDropdown')">Conférences * <i>&#x25BC;</i></div>
+                <div class="dropdown-content" id="conferenceDropdown">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sélection</th>
+                                    <th>Thème</th>
+                                    <th>Conférencier</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="conferenceTable"></tbody>
+                        </table>
+                    </div>
+                    
+                </div>
             </div>
+            
+            <button type="submit" class="btn">Se préinscrire</button>
+        </form>
+        <div id="loader">
+            <div class="spinner"></div>
+        </div>        
+    </div>
 
-            <!-- Message de confirmation -->
-            <div id="confirmationMessage" class=""></div>
-                </form>
-            </div>
-    <!-- Inclusion du script -->
-    <script src="./script.js" defer></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <!-- Scripts -->
+    <script>
+        // Fonction pour basculer l'affichage des listes déroulantes
+function toggleDropdown(id) {
+    const dropdown = document.getElementById(id);
+    if (dropdown) {
+        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    } else {
+        console.error(`Élément avec l'ID "${id}" introuvable.`);
+    }
+}
+
+// Fonction pour afficher/masquer le loader
+function toggleLoader(show) {
+    const loader = document.getElementById("loader");
+    if (!loader) {
+        console.error("Loader introuvable dans le DOM.");
+        return;
+    }
+    loader.style.display = show ? "block" : "none";
+}
+
+// Fonction pour désactiver/activer le bouton Submit
+function toggleButtonState(disabled) {
+    const submitButton = document.querySelector("button[type='submit']");
+    if (submitButton) {
+        submitButton.disabled = disabled;
+        submitButton.style.cursor = disabled ? "not-allowed" : "pointer";
+        submitButton.style.opacity = disabled ? "0.7" : "1";
+    }
+}
+
+// Fonction pour afficher un Toast sans dépendance
+function showToast(message, type = "info") {
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    // Style du toast
+    toast.style.position = "fixed";
+    toast.style.top = "20px";
+    toast.style.right = "20px";
+    toast.style.backgroundColor = type === "success" ? "#28a745" : "#dc3545";
+    toast.style.color = "#fff";
+    toast.style.padding = "10px 15px";
+    toast.style.borderRadius = "5px";
+    toast.style.zIndex = "9999";
+    toast.style.opacity = "1";
+    toast.style.transition = "opacity 0.5s ease";
+
+    // Supprimer le toast après 3 secondes
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+// Fonction utilitaire pour obtenir une valeur de champ
+function getInputValue(selector, required = true) {
+    const element = document.querySelector(selector);
+    if (!element && required) {
+        showToast(`Le champ ${selector} est obligatoire.`, "error");
+        return null;
+    }
+    return element ? element.value.trim() : null;
+}
+
+// Gestionnaire de la soumission du formulaire
+document.getElementById("registrationForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Activer le loader et désactiver le bouton
+    toggleLoader(true);
+    toggleButtonState(true);
+
+    const formData = {
+        nom: getInputValue("input[name='nom']"),
+        prenom: getInputValue("input[name='prenom']"),
+        email: getInputValue("input[name='email']"),
+        tel: getInputValue("input[name='tel']"),
+        sexe: getInputValue("select[name='sexe']"),
+        date_naissance: getInputValue("input[name='birthday']"),
+        experience_years: getInputValue("select[name='experience_years']"),
+        organisation: getInputValue("input[name='organisation']"),
+        statut_fonction: getInputValue("input[name='statut']"),
+        nationalite: getInputValue("input[name='nationalite']"),
+        pays_residence: getInputValue("input[name='pays_residence']"),
+        langue_parlee: getInputValue("select[name='langue']"),
+
+        // Récupération correcte de toutes les formations générales sélectionnées
+        formation_generale: Array.from(
+            document.querySelectorAll("#generalFormationsTable .row-checkbox:checked")
+        ).map(el => el.closest("tr").cells[1]?.textContent.trim() || ""),
+
+        // Récupération correcte de toutes les conférences sélectionnées
+        conference: (() => {
+            const selectedConferences = document.querySelectorAll("#conferenceTable .row-checkbox:checked");
+            return Array.from(selectedConferences).map(selected => {
+                const cells = selected.closest("tr").cells;
+                return {
+                    theme: cells[1]?.textContent.trim(),
+                    speaker: cells[2]?.textContent.trim(),
+                    date: cells[3]?.textContent.trim(),
+                };
+            });
+        })(),
+    };
+
+    // Validation des champs obligatoires
+    if (!formData.nom || !formData.email || !formData.tel || formData.formation_generale.length === 0 || formData.conference.length === 0) {
+        showToast("Veuillez remplir tous les champs obligatoires et sélectionner au moins une formation et une conférence.", "error");
+        toggleLoader(false);
+        toggleButtonState(false);
+        return;
+    }
+
+    console.log("📤 Données envoyées :", formData);
+
+    try {
+        const response = await fetch("/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            showToast(result.message || "Inscription réussie !", "success");
+            document.getElementById("registrationForm").reset();
+        } else {
+            showToast(result.message || "Erreur lors de l'inscription.", "error");
+        }
+    } catch (error) {
+        console.error("🚨 Erreur lors de la soumission :", error);
+        showToast("Une erreur est survenue. Veuillez réessayer.", "error");
+    } finally {
+        toggleLoader(false);
+        toggleButtonState(false); // Réactiver le bouton
+    }
+});
+
+// Initialisation des éléments DOM
+document.addEventListener("DOMContentLoaded", () => {
+// Données des formations générales
+const generalFormations = [
+    // Formations continues
+    { category: "Formations continues", title: "Certificat en analyse de données axée sur l'intelligence artificielle"},
+    { category: "Formations continues", title: "Formation en gestion de la dette"},
+    { category: "Formations continues", title: "Formation en optimisation budgétaire"},
+    { category: "Formations continues", title: "Formation en optimisation des recettes non fiscales"},
+    { category: "Formations continues", title: "Formation en Gestion budgétaire"},
+    { category: "Formations continues", title: "Formation en planification du développement"},
+    { category: "Formations continues", title: "Formation en suivi et évaluation des projets, programmes et politiques publiques"},
+    { category: "Formations continues", title: "Formation en usage statistiques et prise de décision"},
+    { category: "Formations continues", title: "Formation en prévision et durabilité"},
+    // Formations diplômantes
+    { category: "Formations diplômantes", title: "Master en Gestion de la Politique Économique"},
+    { category: "Formations diplômantes", title: "Master en Data, Economics and Development Policy"},
+  // Formation à la carte
+  { category: "Formation à la carte", title: "Formation à la carte"},
+];
+
+const conferences = [
+  { theme: "Cadrage macroéconomique et marché du travail", speaker: "Pr. Francis José N’GUESSAN", date: "09 avril" },
+  { theme: "Multi-Dimensional Effects of Climate Change on Cameroon’s Economy", speaker: "Pr. MOLUA Ernest LYTIA", date: "26 avril" },
+  { theme: "Les enjeux de la politique économique dans les pays d’Afrique Centrale et des Grands Lacs", speaker: "Dr Christian EBEKE", date: "28 mai" },
+  { theme: "Problématique des réserves de change en Afrique Centrale", speaker: "Pr. Françoise OKAH EFOGO", date: "25 juin" },
+  { theme: "Effets de l’insécurité sur la conduite de la politique économique", speaker: "Dr. Thérèse Félicité AZENG", date: "30 juillet" },
+  { theme: "État de droit et politique économique", speaker: "Pr. Nadine MACHIKOU", date: "27 août" },
+  { theme: "Import-substitution ou industrie industrialisante ou substitution des exportations ?", speaker: "Pr. Dieudonné BONDOMA YOKONO", date: "10 septembre" },
+  { theme: "Gestion de la dette", speaker: "M. Edmond Koukoura GNAMIEN", date: "26 novembre" },
+  { theme: "L’économie contre la société ?", speaker: "Pr. Armand LEKA ESSOMBA", date: "10 décembre" }
+];
+    // Charger les données
+    loadData("generalFormationsTable", generalFormations, ["title"]);
+    loadData("conferenceTable", conferences, ["theme", "speaker", "date"]);
+
+    // Fixer la date maximale pour le champ "Date de naissance"
+    const birthdayInput = document.getElementById("birthday");
+    if (birthdayInput) {
+        birthdayInput.max = new Date().toISOString().split("T")[0];
+    }
+});
+
+// Fonction pour charger les données dans les tableaux
+// Chargement des données dans un tableau
+function loadData(id, data, fields) {
+    const tableBody = document.getElementById(id);
+    if (!tableBody) {
+        console.error(`Table avec l'ID "${id}" introuvable.`);
+        return;
+    }
+    data.forEach((item) => {
+        const row = document.createElement("tr");
+
+        // Générer le contenu des colonnes
+        row.innerHTML = fields.map((field) => `<td>${item[field]}</td>`).join("");
+
+        // Ajouter une case à cocher dans la première colonne
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.classList.add("row-checkbox");
+        const td = document.createElement("td");
+        td.appendChild(checkbox);
+        row.prepend(td);
+
+        // Gérer l'interaction sur la ligne
+        row.addEventListener("click", (e) => {
+            if (e.target !== checkbox) {
+                checkbox.checked = !checkbox.checked;
+            }
+            row.classList.toggle("selected-row", checkbox.checked);
+        });
+
+        // Ajouter la ligne au tableau
+        tableBody.appendChild(row);
+    });
+}
+
+
+function autocomplete(inp, arr) {
+    var currentFocus;
+    inp.addEventListener("input", function(e) {
+        var a, b, i, val = this.value;
+        closeAllLists();
+        if (!val) { return false;}
+        currentFocus = -1;
+        a = document.createElement("DIV");
+        a.setAttribute("id", this.id + "-autocomplete-list");
+        a.setAttribute("class", "autocomplete-items");
+        this.parentNode.appendChild(a);
+        for (i = 0; i < arr.length; i++) {
+            if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                b = document.createElement("DIV");
+                b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                b.innerHTML += arr[i].substr(val.length);
+                b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                b.addEventListener("click", function(e) {
+                    inp.value = this.getElementsByTagName("input")[0].value;
+                    closeAllLists();
+                });
+                a.appendChild(b);
+            }
+        }
+    });
+    inp.addEventListener("keydown", function(e) {
+        var x = document.getElementById(this.id + "-autocomplete-list");
+        if (x) x = x.getElementsByTagName("div");
+        if (e.keyCode == 40) {
+            currentFocus++;
+            addActive(x);
+        } else if (e.keyCode == 38) {
+            currentFocus--;
+            addActive(x);
+        } else if (e.keyCode == 13) {
+            e.preventDefault();
+            if (currentFocus > -1) {
+                if (x) x[currentFocus].click();
+            }
+        }
+    });
+    function addActive(x) {
+        if (!x) return false;
+        removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
+        x[currentFocus].classList.add("autocomplete-active");
+    }
+    function removeActive(x) {
+        for (var i = 0; i < x.length; i++) {
+            x[i].classList.remove("autocomplete-active");
+        }
+    }
+    function closeAllLists(elmnt) {
+        var x = document.getElementsByClassName("autocomplete-items");
+        for (var i = 0; i < x.length; i++) {
+            if (elmnt != x[i] && elmnt != inp) {
+                x[i].parentNode.removeChild(x[i]);
+            }
+        }
+    }
+    document.addEventListener("click", function (e) {
+        closeAllLists(e.target);
+    });
+}
+
+var countries = ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros", "Congo", "Cote D Ivoire", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea Bissau", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"]
+
+autocomplete(document.getElementById("pays_residence"), countries);
+    </script>
 </body>
 </html>
-
