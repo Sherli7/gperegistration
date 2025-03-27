@@ -1,0 +1,43 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Étape 1 : Cloner le dépôt
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Étape 2 : Configurer la clé SSH pour se connecter au VPS
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+    # Étape 3 : Déployer sur le VPS Debian 11
+    - name: Deploy to VPS
+      run: |
+        ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+          # Aller dans le répertoire de ton projet sur le VPS
+          cd /var/www/html/gperegistration
+
+          # S'assurer que Git est configuré pour accepter les pulls
+          git config --global --add safe.directory /var/www/html/gperegistration
+
+          # Mettre à jour le code 
+          git pull origin main
+
+          # Installer les dépendances
+          npm install
+
+          # Redémarrer l'application avec PM2 en utilisant ecosystem.config.js
+          pm2 restart gperegistration || pm2 start ecosystem.config.js
+        EOF
