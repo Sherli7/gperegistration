@@ -157,9 +157,9 @@ const generalFormations = [
 ];
 
 const conferences = [
-  /* { theme: "la politique de l'adéquation formation-emploi et ses difficultés", speaker: "Pr. Ebénézer NJOH MOUELLE", date: "26 février" }, */
+  /* /* { theme: "la politique de l'adéquation formation-emploi et ses difficultés", speaker: "Pr. Ebénézer NJOH MOUELLE", date: "26 février" }, */
   /*{ theme: "L’actualité des politiques macroprudentielles", speaker: "Pr. Bruno BEKOLO EBE", date: "26 mars" },*/
-  /*{ theme: "Cadrage macroéconomique et marché du travail", speaker: "Pr. Francis José N’GUESSAN", date: "09 avril" },*/
+  /*{ theme: "Cadrage macroéconomique et marché du travail", speaker: "Pr. Francis José N’GUESSAN", date: "09 avril" },
   { theme: "Multi-Dimensional Effects of Climate Change on Cameroon’s Economy", speaker: "Pr. MOLUA Ernest LYTIA", date: "26 avril" },
   { theme: "Les enjeux de la politique économique dans les pays d’Afrique Centrale et des Grands Lacs", speaker: "Dr Christian EBEKE", date: "28 mai" },
   { theme: "Problématique des réserves de change en Afrique Centrale", speaker: "Pr. Françoise OKAH EFOGO", date: "25 juin" },
@@ -167,7 +167,7 @@ const conferences = [
   { theme: "État de droit et politique économique", speaker: "Pr. Nadine MACHIKOU", date: "27 août" },
   { theme: "Import-substitution ou industrie industrialisante ou substitution des exportations ?", speaker: "Pr. Dieudonné BONDOMA YOKONO", date: "10 septembre" },
   { theme: "Gestion de la dette", speaker: "M. Edmond Koukoura GNAMIEN", date: "26 novembre" },
-  { theme: "L’économie contre la société ?", speaker: "Pr. Armand LEKA ESSOMBA", date: "10 décembre" }
+  { theme: "L’économie contre la société ?", speaker: "Pr. Armand LEKA ESSOMBA", date: "10 décembre" } */
 ];
     // Charger les données
     loadData("generalFormationsTable", generalFormations, ["title"]);
