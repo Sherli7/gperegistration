@@ -75,9 +75,9 @@ function showToast(message, type = "info", autoHide = true) {
             }
         });
     } else if (autoHide) {
-        setTimeout(() => {
-            toast.style.opacity = "0";
-            setTimeout(() => toast.remove(), 500);
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 500);
         }, 4000);
     }
 }
