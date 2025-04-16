@@ -615,3 +615,10 @@ const escapeHtml = (unsafe) => {
          .replace(/"/g, "&quot;")
          .replace(/'/g, "&#039;");
 };
+
+window.addEventListener("load", () => {
+    const loader = document.getElementById("customLoader");
+    if (loader) {
+        loader.style.display = "none";
+    }
+});

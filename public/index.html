@@ -27,9 +27,12 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <img src="/images/logo.png" alt="Logo">
-            <h1>Formulaire de Préinscription</h1>
+         <header style="display: flex; align-items: center; justify-content: space-between; padding: 10px;">
+            <img src="/images/logo.png" alt="Logo GPE Cameroun" width="100">
+            <div>
+                <h1>Formulaire de Préinscription</h1>
+                <p style="font-style: italic;">"Ensemble, réinventons les politiques économiques d'Afrique"</p>
+            </div>
         </header>
         <form id="registrationForm">
             <div class="input-field">
@@ -139,5 +142,20 @@
         </div>        
     </div>
     <script src="script.js" defer></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .logo-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 10px; /* Optional: to add some space around the logo */
+        }
+        .logo-container img {
+            width: 200px; /* Adjust size as needed */
+        }
+    </style>
 </body>
 </html>

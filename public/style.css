@@ -30,24 +30,27 @@ body {
 header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    margin: -30px -40px 30px -40px; /* S'étend aux bords du container */
-    background: linear-gradient(to right, #053a80, #3fbc00); /* Dégradé ajusté */
-    padding: 20px 0;
-    border-radius: 12px 12px 0 0; /* Arrondi seulement en haut */
+    justify-content: space-between; /* Espace entre le logo et le texte */
+    padding: 10px;
+    /*background-color: #0056b3;*/
+}
+
+header div {
+    text-align: center; /* Centre le texte dans le div */
+    flex-grow: 1; /* Permet au texte de prendre l'espace disponible */
 }
 
 header img {
-    width: 70px; /* Taille ajustée */
+    width: 100px; /* Adjust size as needed */
     height: auto;
-    margin-bottom: 10px;
+    margin-right: 20px;
 }
 
 header h1 {
     font-size: 22px; /* Taille ajustée */
     font-weight: 600;
-    color: #fff;
+    color: #13327b; /* Remplacez par la couleur souhaitée */
+    text-transform: uppercase;
     text-align: center;
 }
 
@@ -383,6 +386,9 @@ form {
     .choices__list--single .choices__item .choices-text {
         max-width: calc(100% - 50px);
     }
+    header img {
+        width: 80px; /* Taille réduite pour les écrans plus petits */
+    }
 }
 
 /* ===== Choices.js Styles ===== */
@@ -506,4 +512,57 @@ form {
 /* On peut aussi styler l'input lui-même en cas d'erreur, si nécessaire */
 .phone-prefix-input.is-invalid input[type="tel"] {
     /* Optionnel: changer la couleur du texte ou autre */
+}
+
+#customLoader {
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    background-color: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.loader-content {
+    text-align: center;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+}
+
+.loader-content img {
+    max-width: 120px;
+    margin-bottom: 20px;
+}
+
+.loader-content h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.loader-content h2 span {
+    color: #8bc34a;
+    font-weight: 600;
+}
+
+.loader-content .loader-circle {
+    margin: 20px auto;
+    width: 50px;
+    height: 50px;
+    border: 6px solid #e0e0e0;
+    border-top: 6px solid #8bc34a;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loader-content p {
+    font-size: 16px;
+    margin-top: 15px;
+    color: #666;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
