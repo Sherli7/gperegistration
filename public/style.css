@@ -1,3 +1,4 @@
+/* Import des polices */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
 
 /* ===== Styles Globaux ===== */
@@ -29,30 +30,93 @@ body {
 /* ===== Header ===== */
 header {
     display: flex;
-    align-items: center;
-    justify-content: space-between; /* Espace entre le logo et le texte */
-    padding: 10px;
-    /*background-color: #0056b3;*/
-}
-
-header div {
-    text-align: center; /* Centre le texte dans le div */
-    flex-grow: 1; /* Permet au texte de prendre l'espace disponible */
+    align-items: center; /* Centre verticalement */
+    justify-content: flex-start; /* Aligne l'image à gauche */
+    background-color: #0056b3;
+    padding: 15px 20px; /* Ajustement du padding */
+    gap: 20px; /* Espace entre l'image et le texte */
+    margin-bottom: 30px; /* Espace sous le header pour le séparateur */
 }
 
 header img {
-    width: 100px; /* Adjust size as needed */
+    width: 100px; /* Respecte la largeur définie dans le HTML */
     height: auto;
-    margin-right: 20px;
+    animation: fade 2s ease-in infinite; /* Conserver l'animation */
+}
+
+header div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centre le texte verticalement dans le div */
 }
 
 header h1 {
-    font-size: 22px; /* Taille ajustée */
+    font-size: 22px;
     font-weight: 600;
-    color: #13327b; /* Remplacez par la couleur souhaitée */
+    color: #f3f4f6;
     text-transform: uppercase;
-    text-align: center;
+    margin: 0;
 }
+
+header p {
+    font-style: italic;
+    color: #f3f4f6;
+    font-size: 14px;
+    margin: 5px 0 0 0;
+}
+
+/* Supprimer le style global img pour éviter les conflits */
+img:not(header img) {
+    margin: 0 auto; /* Applique margin: 0 auto uniquement aux images hors header */
+}
+
+/* ===== SEPARATEUR ========== */
+/* ===== SEPARATEUR ========== */
+.separator {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0 30px 0; /* Espace uniquement en dessous */
+}
+
+.line {
+    flex: 1;
+    height: 2px;
+    background-color: #333; /* Ligne continue sombre */
+    position: relative;
+    z-index: 0; /* Passe derrière */
+}
+
+.center-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1; /* Devant la ligne */
+    margin: 0 10px;
+    background-color: transparent;
+}
+
+.square {
+    width: 6px;
+    height: 6px;
+    background-color: #042E68; /* Bleu foncé */
+    margin: 0 2px;
+    z-index: 1;
+}
+
+.bar {
+    width: 60px; /* Ajusté selon ton image */
+    height: 12px; /* Plus épais pour bien recouvrir la ligne */
+    background-color: #042E68;
+    z-index: 1;
+}
+
+.spacer {
+    width: 50px; /* Espace entre les deux blocs centraux */
+}
+
 
 /* ===== Formulaire ===== */
 form {
@@ -71,7 +135,7 @@ form {
 
 .input-field label {
     font-weight: 500; /* Un peu moins gras */
-    color: #334155; /* Couleur de label assombrie */
+    color: #334155; /* Couleur de label assombrée */
     font-size: 0.9em;
 }
 
@@ -253,7 +317,6 @@ form {
     white-space: normal; /* Allow wrapping */
     overflow: visible; /* Remove hidden overflow */
     text-overflow: clip; /* Remove ellipsis (or initial) */
-    /* Optional: Adjust padding or line-height if needed for wrapped text */
     padding-right: 0; /* Remove padding that might interact badly with wrap */
 }
 
@@ -303,6 +366,12 @@ form {
     border-top: 6px solid #042E68;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+}
+
+/* Animation pour l'image et le spinner */
+@keyframes fade {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
 @keyframes spin {
@@ -367,11 +436,26 @@ form {
         padding: 20px;
     }
     header {
-        margin: -20px -20px 20px -20px; 
-        padding: 15px 0;
+        flex-direction: column; /* Empile l'image et le texte */
+        align-items: center; /* Centre tout sur mobile */
+        padding: 15px;
+        margin: -20px -20px 20px -20px;
+    }
+    header img {
+        width: 80px; /* Réduit la taille sur mobile */
+        margin-bottom: 10px; /* Espace sous l'image */
     }
     header h1 {
         font-size: 20px;
+    }
+    .separator {
+        margin: 0 0 20px 0; /* Ajustement pour mobile */
+    }
+    .line {
+        margin: 0 3px; /* Réduit l'espace sur mobile */
+    }
+    .center-block {
+        margin: 0 3px; /* Réduit l'espace sur mobile */
     }
     form {
         gap: 15px;
@@ -385,9 +469,6 @@ form {
     }
     .choices__list--single .choices__item .choices-text {
         max-width: calc(100% - 50px);
-    }
-    header img {
-        width: 80px; /* Taille réduite pour les écrans plus petits */
     }
 }
 
@@ -561,8 +642,4 @@ form {
     font-size: 16px;
     margin-top: 15px;
     color: #666;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
 }
