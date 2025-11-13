@@ -65,9 +65,25 @@ app.post('/submit', async (req, res) => {
     langue_parlee,
     statut_fonction,
     formation_generale,
-    conference,
   } = req.body;
 
+ /*    const {
+    nom,
+    prenom,
+    email,
+    tel,
+    sexe,
+    date_naissance,
+    experience_years,
+    organisation,
+    nationalite,
+    pays_residence,
+    langue_parlee,
+    statut_fonction,
+    formation_generale,
+    //conference,
+  } = req.body;
+ */
   console.log("📩 Données reçues :", req.body);
 
   // Validation des champs obligatoires
@@ -85,9 +101,9 @@ app.post('/submit', async (req, res) => {
   if (!Array.isArray(formation_generale) || formation_generale.length === 0) {
     errors.push("Veuillez sélectionner au moins une formation générale.");
   }
-  if (!Array.isArray(conference) || conference.length === 0) {
+/*   if (!Array.isArray(conference) || conference.length === 0) {
     errors.push("Veuillez sélectionner au moins une conférence.");
-  }
+  } */
 
   if (errors.length > 0) {
     return res.status(400).json({ success: false, message: errors.join(' ') });
@@ -106,14 +122,26 @@ app.post('/submit', async (req, res) => {
     const insertQuery = `
       INSERT INTO inscriptions (
         nom, prenom, email, tel, sexe, date_naissance, experience_years, organisation,
-        nationalite, pays_residence, langue_parlee, statut_fonction, formation_generale, conference
+        nationalite, pays_residence, langue_parlee, statut_fonction, formation_generale
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
       RETURNING id
     `;
+/*         const insertQuery = `
+      INSERT INTO inscriptions (
+        nom, prenom, email, tel, sexe, date_naissance, experience_years, organisation,
+        nationalite, pays_residence, langue_parlee, statut_fonction, formation_generale, conference
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      RETURNING id
+    `; */
     const values = [
       nom, prenom, email, tel, sexe, date_naissance, experience_years, organisation || null,
-      nationalite, pays_residence, langue_parlee, statut_fonction, formation_generale, JSON.stringify(conference),
+      nationalite, pays_residence, langue_parlee, statut_fonction, formation_generale,
     ];
+
+   /*      const values = [
+      nom, prenom, email, tel, sexe, date_naissance, experience_years, organisation || null,
+      nationalite, pays_residence, langue_parlee, statut_fonction, formation_generale, JSON.stringify(conference),
+    ]; */
 
     const result = await pool.query(insertQuery, values);
     const inscriptionId = result.rows[0].id;
@@ -164,22 +192,8 @@ app.post('/submit', async (req, res) => {
                     ${formation_generale.map(formation => `<tr><td>${formation}</td></tr>`).join('')}
                   </tbody>
                 </table>
-              </div>
-      
-              <div class="table-container">
-                <h3>Conférences sélectionnées</h3>
-                <table>
-                  <thead>
-                    <tr><th>Thème</th><th>Conférencier</th><th>Date</th></tr>
-                  </thead>
-                  <tbody>
-                    ${conference.map(conf => `<tr><td>${conf.theme}</td><td>${conf.speaker}</td><td>${conf.date}</td></tr>`).join('')}
-                  </tbody>
-                </table>
-              </div>
-      
+              </div>      
               <p>Votre préinscription a été prise en compte.</p>
-      
               <div class="footer">
                 <p>Si vous avez des questions, contactez <a href="mailto:contact@gpe-cameroun.cm">contact@gpe-cameroun.cm</a>.</p>
               </div>
@@ -252,18 +266,10 @@ app.post('/submit', async (req, res) => {
                   ${formation_generale.map(formation => `<tr><td>${formation}</td></tr>`).join('')}
                 </table>
               </div>
-      
-              <div class="table-container">
-                <h3>Conférences sélectionnées</h3>
-                <table>
-                  <tr><th>Thème</th><th>Conférencier</th><th>Date</th></tr>
-                  ${conference.map(conf => `<tr><td>${conf.theme}</td><td>${conf.speaker}</td><td>${conf.date}</td></tr>`).join('')}
-                </table>
-              </div>
             </div>
             <div class="footer">
               <p>Vous recevez cet email car une préinscription a été effectuée.</p>
-              <p>Si besoin, contactez <a href="mailto:tech@domain.com">tech@domain.com</a>.</p>
+              <p>Si besoin, contactez <a href="mailto:contact@gpe-cameroun.cm">contact@gpe-cameroun.cm</a>.</p>
             </div>
           </div>
         </body>

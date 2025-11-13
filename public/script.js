@@ -152,7 +152,7 @@ document.getElementById("registrationForm")?.addEventListener("submit", async (e
         document.querySelectorAll("#generalFormationsContainer .row-checkbox:checked")
     ).map(el => el.closest(".dropdown-item").querySelector(".item-label")?.textContent.trim() || "");
 
-    const selectedConferences = Array.from(
+/*     const selectedConferences = Array.from(
         document.querySelectorAll("#conferenceContainer .row-checkbox:checked")
     ).map(el => {
         const itemLabel = el.closest(".dropdown-item").querySelector(".item-label");
@@ -163,7 +163,7 @@ document.getElementById("registrationForm")?.addEventListener("submit", async (e
         const date = itemLabel.querySelector('.field-date')?.textContent.trim();
         return { theme, speaker, date }; // Retourner null si un champ manque?
     }).filter(conf => conf && conf.theme); // Filtrer les potentiels nulls ou incomplets
-
+ */
     // Get values directly from select elements
     const selectedNationality = getInputValue("#nationalitySelect");
     const selectedResidence = getInputValue("#pays_residenceSelect");
@@ -186,7 +186,7 @@ document.getElementById("registrationForm")?.addEventListener("submit", async (e
         pays_residence: selectedResidence,
         langue_parlee: getInputValue("select[name='langue']"),
         formation_generale: selectedFormations, 
-        conference: selectedConferences, 
+        //conference: selectedConferences, 
         indicatif_pays: selectedCountryCode, // The selected prefix (+33 etc)
     };
 
@@ -227,13 +227,13 @@ document.getElementById("registrationForm")?.addEventListener("submit", async (e
     } else {
         document.querySelector('#generalFormationsContainer')?.closest('.dropdown-container').querySelector('.dropdown-title').classList.remove('is-invalid');
     }
-    if (selectedConferences.length === 0) { 
+/*     if (selectedConferences.length === 0) { 
         isValid = false; 
         errorMessages.push("Conférence"); 
         document.querySelector('#conferenceContainer')?.closest('.dropdown-container').querySelector('.dropdown-title').classList.add('is-invalid');
     } else {
         document.querySelector('#conferenceContainer')?.closest('.dropdown-container').querySelector('.dropdown-title').classList.remove('is-invalid');
-    }
+    } */
 
     // Check phone validity explicitly
     if (!isPhoneValid) {
