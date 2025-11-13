@@ -301,7 +301,6 @@ app.post('/submit', async (req, res) => {
   }
 });
 
-
 // Démarrer le serveur
 app.listen(port, () => {
     console.log(`🚀 Serveur démarré sur http://${process.env.ADDRESS}:${port}`);
