@@ -122,13 +122,10 @@ app.post('/submit', async (req, res) => {
     columns.push('formation_generale');
     values.push(formation_generale);
 
-    // Ajouter conference si fourni et non vide (optionnel, jsonb)
-    let conferenceIndex = -1;
-    if (Array.isArray(conference) && conference.length > 0) {
-      columns.push('conference');
-      values.push(JSON.stringify(conference)); // string pour jsonb
-      conferenceIndex = values.length - 1;
-    }
+    // Ajouter conference TOUJOURS (même vide) pour éviter NULL (colonne NOT NULL)
+    columns.push('conference');
+    const conferenceValue = Array.isArray(conference) && conference.length > 0 ? conference : []; // Tableau vide si absent
+    values.push(JSON.stringify(conferenceValue)); // Toujours JSON pour jsonb
 
     // Construire placeholders avec casts explicites
     const placeholders = values.map((_, i) => {
