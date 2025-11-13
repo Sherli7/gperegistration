@@ -26,18 +26,63 @@ jobs:
     - name: Deploy to VPS
       run: |
         ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+          set -e  # Arrêter sur première erreur
+
           # Aller dans le répertoire de ton projet sur le VPS
           cd /var/www/html/gperegistration
 
           # S'assurer que Git est configuré pour accepter les pulls
           git config --global --add safe.directory /var/www/html/gperegistration
 
-          # Mettre à jour le code 
+          echo "📂 Statut Git avant pull :"
+          git status
+
+          # Gérer les changements locaux : stash pour éviter conflits
+          if ! git diff --quiet; then
+            echo "💾 Changements locaux détectés, on stash..."
+            git stash push -m "Auto-stash avant deploy $(date)"
+          fi
+
+          # Mettre à jour le code
+          echo "🔄 Pull en cours..."
           git pull origin main
 
-          # Installer les dépendances
-          npm install
+          # Vérifier post-pull
+          echo "📂 Statut Git après pull :"
+          git status
 
-          # Redémarrer l'application avec PM2 en utilisant ecosystem.config.js
-          pm2 restart gperegistration || pm2 start ecosystem.config.js
+          # Si conflit persiste (rare après stash), reset hard (ATTENTION : perd mods locales !)
+          if git status | grep -q "You are in the middle of a conflicted merge"; then
+            echo "⚠️ Conflit détecté, reset hard vers origin/main..."
+            git reset --hard origin/main
+            git clean -fd  # Nettoie fichiers non trackés
+          fi
+
+          # Drop le stash si existant (pour garder clean ; commente si tu veux pop après test)
+          if git stash list | grep -q "Auto-stash"; then
+            echo "🗑️ Drop stash auto..."
+            git stash drop
+          fi
+
+          # Installer les dépendances
+          echo "📦 Installation npm..."
+          npm ci --only=production  # Plus rapide que install, ignore dev deps
+
+          # Redémarrer l'application avec PM2
+          echo "🔄 Restart PM2..."
+          if pm2 list | grep -q "gperegistration"; then
+            pm2 restart gperegistration
+          else
+            echo "🚀 Start PM2 avec ecosystem.config.js..."
+            if [ -f ecosystem.config.js ]; then
+              pm2 start ecosystem.config.js --name gperegistration
+            else
+              echo "❌ ecosystem.config.js absent, start manuel (adapte si besoin)"
+              # Ex. : pm2 start server.js --name gperegistration
+              exit 1  # Stop si config manquante
+            fi
+          fi
+
+          pm2 save  # Sauvegarde l'état PM2
+          echo "✅ Deploy terminé !"
         EOF

@@ -67,23 +67,6 @@ app.post('/submit', async (req, res) => {
     formation_generale,
   } = req.body;
 
- /*    const {
-    nom,
-    prenom,
-    email,
-    tel,
-    sexe,
-    date_naissance,
-    experience_years,
-    organisation,
-    nationalite,
-    pays_residence,
-    langue_parlee,
-    statut_fonction,
-    formation_generale,
-    //conference,
-  } = req.body;
- */
   console.log("📩 Données reçues :", req.body);
 
   // Validation des champs obligatoires
