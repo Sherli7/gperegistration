@@ -481,7 +481,13 @@ const conferences = [
     // Charger les données
     loadData("generalFormationsContainer", generalFormations, ["title"]);
     // Charger UNIQUEMENT les conférences à venir
-    loadData("conferenceContainer", upcomingConferences, ["theme", "speaker", "date"]);
+    //loadData("conferenceContainer", upcomingConferences, ["theme", "speaker", "date"]);
+
+    // Add event listener for dropdown toggle
+    const generalFormationsTitle = document.querySelector('#generalFormationsContainer').previousElementSibling;
+    if (generalFormationsTitle) {
+        generalFormationsTitle.addEventListener('click', () => toggleDropdown('generalFormationsContainer'));
+    }
 
     const birthdayInput = document.getElementById("birthday");
     if (birthdayInput) {
