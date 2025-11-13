@@ -106,7 +106,7 @@ app.post('/submit', async (req, res) => {
       INSERT INTO inscriptions (
         nom, prenom, email, tel, sexe, date_naissance, experience_years, organisation,
         nationalite, pays_residence, langue_parlee, statut_fonction, formation_generale
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING id
     `;
 /*         const insertQuery = `
