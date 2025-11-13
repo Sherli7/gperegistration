@@ -65,6 +65,7 @@ app.post('/submit', async (req, res) => {
     langue_parlee,
     statut_fonction,
     formation_generale,
+    conference, // accept optional conference payload if present
   } = req.body;
 
   console.log("📩 Données reçues :", req.body);
@@ -84,9 +85,6 @@ app.post('/submit', async (req, res) => {
   if (!Array.isArray(formation_generale) || formation_generale.length === 0) {
     errors.push("Veuillez sélectionner au moins une formation générale.");
   }
-/*   if (!Array.isArray(conference) || conference.length === 0) {
-    errors.push("Veuillez sélectionner au moins une conférence.");
-  } */
 
   if (errors.length > 0) {
     return res.status(400).json({ success: false, message: errors.join(' ') });
@@ -101,164 +99,178 @@ app.post('/submit', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Un utilisateur avec cet email existe déjà.' });
     }
 
-    // Insérer les données dans la base
-    const insertQuery = `
-      INSERT INTO inscriptions (
-        nom, prenom, email, tel, sexe, date_naissance, experience_years, organisation,
-        nationalite, pays_residence, langue_parlee, statut_fonction, formation_generale
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-      RETURNING id
-    `;
-/*         const insertQuery = `
-      INSERT INTO inscriptions (
-        nom, prenom, email, tel, sexe, date_naissance, experience_years, organisation,
-        nationalite, pays_residence, langue_parlee, statut_fonction, formation_generale, conference
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-      RETURNING id
-    `; */
-    const values = [
-      nom, prenom, email, tel, sexe, date_naissance, experience_years, organisation || null,
-      nationalite, pays_residence, langue_parlee, statut_fonction, formation_generale,
+    // Construire insertion dynamiquement pour éviter mismatch entre colonnes et placeholders
+    const columns = [
+      'nom','prenom','email','tel','sexe','date_naissance','experience_years','organisation',
+      'nationalite','pays_residence','langue_parlee','statut_fonction'
     ];
 
-   /*      const values = [
+    const values = [
       nom, prenom, email, tel, sexe, date_naissance, experience_years, organisation || null,
-      nationalite, pays_residence, langue_parlee, statut_fonction, formation_generale, JSON.stringify(conference),
-    ]; */
+      nationalite, pays_residence, langue_parlee, statut_fonction
+    ];
+
+    // Colonnes traitées comme JSON dans la DB (adapter si ce n'est pas le cas)
+    const jsonCols = new Set(['formation_generale', 'conference']);
+
+    // Ajouter formation_generale (obligatoire) — stocker en JSON
+    columns.push('formation_generale');
+    values.push(JSON.stringify(formation_generale));
+
+    // Ajouter conference si fourni et non vide (optionnel)
+    if (Array.isArray(conference) && conference.length > 0) {
+      columns.push('conference');
+      values.push(JSON.stringify(conference));
+    }
+
+    // Construire placeholders en ajoutant ::jsonb pour les colonnes JSON si nécessaire
+    const placeholders = values.map((_, i) => {
+      const col = columns[i];
+      return jsonCols.has(col) ? `$${i + 1}::jsonb` : `$${i + 1}`;
+    });
+
+    const insertQuery = `
+      INSERT INTO inscriptions (${columns.join(', ')})
+      VALUES (${placeholders.join(', ')})
+      RETURNING id
+    `;
+
+    console.log('DEBUG insertQuery:', insertQuery.replace(/\s+/g, ' '));
+    console.log('DEBUG values.length/type:', values.length, values.map(v => typeof v));
 
     const result = await pool.query(insertQuery, values);
     const inscriptionId = result.rows[0].id;
     console.log("✅ Préinscription enregistrée avec ID :", inscriptionId);
 
-      // **📧 Email de confirmation utilisateur**
-      const userMailOptions = {
-        from: process.env.SMTP_CONTACTUSER,
-        to: email,
-        subject: 'Préinscription confirmée',
-        html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <title>Confirmation de Préinscription</title>
-          <style>
-            body { background-color: #f4f4f4; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
-            .email-container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; }
-            .header { background-color: #042E68; color: #ffffff; text-align: center; padding: 20px; }
-            .header h1 { font-size: 22px; margin: 0; font-weight: bold; }
-            .content { padding: 20px; font-size: 16px; color: #333333; }
-            .table-container { margin-top: 20px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #042E68; color: white; }
-            .footer { text-align: center; padding: 15px; font-size: 12px; color: #777777; background: #f4f4f4; }
-            .footer a { color: #042E68; text-decoration: none; }
-          </style>
-        </head>
-        <body>
-          <div class="email-container">
-            <div class="header">
-              <h1>Confirmation de Préinscription</h1>
-            </div>
-      
-            <div class="content">
-              <p>Bonjour <strong>${prenom} ${nom}</strong>,</p>
-              <p>Nous avons bien pris en compte votre sélection :</p>
-      
-              <div class="table-container">
-                <h3>Formations sélectionnées</h3>
-                <table>
-                  <thead>
-                    <tr><th>Formation</th></tr>
-                  </thead>
-                  <tbody>
-                    ${formation_generale.map(formation => `<tr><td>${formation}</td></tr>`).join('')}
-                  </tbody>
-                </table>
-              </div>      
-              <p>Votre préinscription a été prise en compte.</p>
-              <div class="footer">
-                <p>Si vous avez des questions, contactez <a href="mailto:contact@gpe-cameroun.cm">contact@gpe-cameroun.cm</a>.</p>
-              </div>
-            </div>
+    // **📧 Email de confirmation utilisateur**
+    const userMailOptions = {
+      from: process.env.SMTP_CONTACTUSER,
+      to: email,
+      subject: 'Préinscription confirmée',
+      html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Confirmation de Préinscription</title>
+        <style>
+          body { background-color: #f4f4f4; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+          .email-container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; }
+          .header { background-color: #042E68; color: #ffffff; text-align: center; padding: 20px; }
+          .header h1 { font-size: 22px; margin: 0; font-weight: bold; }
+          .content { padding: 20px; font-size: 16px; color: #333333; }
+          .table-container { margin-top: 20px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #042E68; color: white; }
+          .footer { text-align: center; padding: 15px; font-size: 12px; color: #777777; background: #f4f4f4; }
+          .footer a { color: #042E68; text-decoration: none; }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <div class="header">
+            <h1>Confirmation de Préinscription</h1>
           </div>
-        </body>
-        </html> 
-        `,
-      };
-  
-      // **📧 Email d'alerte admin**
-      const adminMailOptions = {
-        from: `"GPE Cameroun" <${process.env.SMTP_CONTACTUSER}>`,
-        replyTo: `"Support GPE Cameroun" <contact@gpe-cameroun.cm>`,
-        to: "contact@gpe-cameroun.cm",
-        subject: "Nouvelle préinscription reçue",
-        headers: {
-          "X-Priority": "1", // Priorité haute
-          "X-MSMail-Priority": "High",
-          "Importance": "High",
-        },
-        html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <title>Nouvelle préinscription</title>
-          <style>
-            body { background-color: #f4f4f4; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
-            .email-container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; }
-            .header { background-color: #042E68; color: #ffffff; text-align: center; padding: 20px; }
-            .header h1 { font-size: 22px; margin: 0; font-weight: bold; }
-            .content { padding: 20px; font-size: 16px; color: #333333; }
-            .table-container { margin-top: 20px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #042E68; color: white; }
-            .footer { text-align: center; padding: 15px; font-size: 12px; color: #777777; background: #f4f4f4; }
-            .footer a { color: #042E68; text-decoration: none; }
-          </style>
-        </head>
-        <body>
-          <div class="email-container">
-            <div class="header">
-              <h1>Nouvelle préinscription</h1>
-            </div>
-      
-            <div class="content">
-              <p><strong>Détails de la préinscription :</strong></p>
-      
-              <div class="table-container">
-                <table>
-                  <tr><th>Champ</th><th>Valeur</th></tr>
-                  <tr><td><strong>Nom</strong></td><td>${nom}</td></tr>
-                  <tr><td><strong>Prénom</strong></td><td>${prenom}</td></tr>
-                  <tr><td><strong>Email</strong></td><td>${email}</td></tr>
-                  <tr><td><strong>Téléphone</strong></td><td>${tel}</td></tr>
-                  <tr><td><strong>Sexe</strong></td><td>${sexe}</td></tr>
-                  <tr><td><strong>Organisation</strong></td><td>${organisation || 'Non renseignée'}</td></tr>
-                  <tr><td><strong>Fonction</strong></td><td>${statut_fonction}</td></tr>
-                  <tr><td><strong>Expérience</strong></td><td>${experience_years}</td></tr>
-                  <tr><td><strong>Langue</strong></td><td>${langue_parlee}</td></tr>
-                </table>
-              </div>
-      
-              <div class="table-container">
-                <h3>Formations sélectionnées</h3>
-                <table>
+    
+          <div class="content">
+            <p>Bonjour <strong>${prenom} ${nom}</strong>,</p>
+            <p>Nous avons bien pris en compte votre sélection :</p>
+    
+            <div class="table-container">
+              <h3>Formations sélectionnées</h3>
+              <table>
+                <thead>
                   <tr><th>Formation</th></tr>
+                </thead>
+                <tbody>
                   ${formation_generale.map(formation => `<tr><td>${formation}</td></tr>`).join('')}
-                </table>
-              </div>
-            </div>
+                </tbody>
+              </table>
+            </div>      
+            <p>Votre préinscription a été prise en compte.</p>
             <div class="footer">
-              <p>Vous recevez cet email car une préinscription a été effectuée.</p>
-              <p>Si besoin, contactez <a href="mailto:contact@gpe-cameroun.cm">contact@gpe-cameroun.cm</a>.</p>
+              <p>Si vous avez des questions, contactez <a href="mailto:contact@gpe-cameroun.cm">contact@gpe-cameroun.cm</a>.</p>
             </div>
           </div>
-        </body>
-        </html>
-        `,
-  };
+        </div>
+      </body>
+      </html> 
+      `,
+    };
+
+    // **📧 Email d'alerte admin**
+    const adminMailOptions = {
+      from: `"GPE Cameroun" <${process.env.SMTP_CONTACTUSER}>`,
+      replyTo: `"Support GPE Cameroun" <contact@gpe-cameroun.cm>`,
+      to: "contact@gpe-cameroun.cm",
+      subject: "Nouvelle préinscription reçue",
+      headers: {
+        "X-Priority": "1",
+        "X-MSMail-Priority": "High",
+        "Importance": "High",
+      },
+      html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Nouvelle préinscription</title>
+        <style>
+          body { background-color: #f4f4f4; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+          .email-container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; }
+          .header { background-color: #042E68; color: #ffffff; text-align: center; padding: 20px; }
+          .header h1 { font-size: 22px; margin: 0; font-weight: bold; }
+          .content { padding: 20px; font-size: 16px; color: #333333; }
+          .table-container { margin-top: 20px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #042E68; color: white; }
+          .footer { text-align: center; padding: 15px; font-size: 12px; color: #777777; background: #f4f4f4; }
+          .footer a { color: #042E68; text-decoration: none; }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <div class="header">
+            <h1>Nouvelle préinscription</h1>
+          </div>
+    
+          <div class="content">
+            <p><strong>Détails de la préinscription :</strong></p>
+    
+            <div class="table-container">
+              <table>
+                <tr><th>Champ</th><th>Valeur</th></tr>
+                <tr><td><strong>Nom</strong></td><td>${nom}</td></tr>
+                <tr><td><strong>Prénom</strong></td><td>${prenom}</td></tr>
+                <tr><td><strong>Email</strong></td><td>${email}</td></tr>
+                <tr><td><strong>Téléphone</strong></td><td>${tel}</td></tr>
+                <tr><td><strong>Sexe</strong></td><td>${sexe}</td></tr>
+                <tr><td><strong>Organisation</strong></td><td>${organisation || 'Non renseignée'}</td></tr>
+                <tr><td><strong>Fonction</strong></td><td>${statut_fonction}</td></tr>
+                <tr><td><strong>Expérience</strong></td><td>${experience_years}</td></tr>
+                <tr><td><strong>Langue</strong></td><td>${langue_parlee}</td></tr>
+              </table>
+            </div>
+    
+            <div class="table-container">
+              <h3>Formations sélectionnées</h3>
+              <table>
+                <tr><th>Formation</th></tr>
+                ${formation_generale.map(formation => `<tr><td>${formation}</td></tr>`).join('')}
+              </table>
+            </div>
+          </div>
+          <div class="footer">
+            <p>Vous recevez cet email car une préinscription a été effectuée.</p>
+            <p>Si besoin, contactez <a href="mailto:contact@gpe-cameroun.cm">contact@gpe-cameroun.cm</a>.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+      `,
+    };
 
     // ✅ Envoi des emails en parallèle
     console.log("📧 Envoi des emails en cours...");
