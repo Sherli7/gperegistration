@@ -180,7 +180,7 @@ document.getElementById("registrationForm")?.addEventListener("submit", async (e
         sexe: getInputValue("select[name='sexe']"),
         date_naissance: getInputValue("input[name='birthday']"),
         experience_years: getInputValue("select[name='experience_years']"),
-        organisation: getInputValue("input[name='organisation']"), // Optional in DB, but required in form
+        organisation: getInputValue("input[name='organisation']"),
         statut_fonction: getInputValue("input[name='statut']"),
         nationalite: selectedNationality,
         pays_residence: selectedResidence,

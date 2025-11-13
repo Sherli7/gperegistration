@@ -19,7 +19,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(bodyParser.json());
 
 // Configuration de Nodemailer
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   service: process.env.SERVICE,
   host: process.env.HOST,
   port: process.env.PORT,
@@ -66,7 +66,6 @@ app.post('/submit', async (req, res) => {
     statut_fonction,
     formation_generale,
     conference, // accept optional conference payload if present
-    indicatif_pays, // optional, ignored for now (add column if needed)
   } = req.body;
 
   console.log("📩 Données reçues :", req.body);
@@ -111,22 +110,20 @@ app.post('/submit', async (req, res) => {
       nationalite, pays_residence, langue_parlee, statut_fonction
     ];
 
-    // Colonnes traitées comme JSON dans la DB (seulement conference est jsonb)
-    const jsonCols = new Set(['conference']);
+    // Colonnes traitées comme JSON dans la DB (adapter si ce n'est pas le cas)
+    const jsonCols = new Set(['formation_generale', 'conference']);
 
-    // Ajouter formation_generale (obligatoire) — passer directement le tableau JS (pg gère l'array)
+    // Ajouter formation_generale (obligatoire) — stocker en JSON
     columns.push('formation_generale');
-    values.push(formation_generale);
+    values.push(JSON.stringify(formation_generale));
 
-    // Ajouter conference si fourni et non vide (optionnel, jsonb)
-    let conferenceIndex = -1;
+    // Ajouter conference si fourni et non vide (optionnel)
     if (Array.isArray(conference) && conference.length > 0) {
       columns.push('conference');
-      values.push(JSON.stringify(conference)); // string pour jsonb
-      conferenceIndex = values.length - 1;
+      values.push(JSON.stringify(conference));
     }
 
-    // Construire placeholders (seulement ::jsonb pour conference)
+    // Construire placeholders en ajoutant ::jsonb pour les colonnes JSON si nécessaire
     const placeholders = values.map((_, i) => {
       const col = columns[i];
       return jsonCols.has(col) ? `$${i + 1}::jsonb` : `$${i + 1}`;
@@ -291,11 +288,11 @@ app.post('/submit', async (req, res) => {
     res.status(200).json({ success: true, id: inscriptionId });
 
   } catch (err) {
-    console.error("🚨 Erreur lors de la préinscription :", err); // Log full err for better debugging
-    res.status(500).json({ success: false, message: "Erreur lors de la préinscription : " + (err.message || 'Erreur inconnue (vérifiez les logs serveur)') });
+    console.error("🚨 Erreur lors de la préinscription :", err.message);
+    res.status(500).json({ success: false, message: "Erreur lors de la préinscription : " + err.message });
   } finally {
     console.log("🗃 Fermeture de la connexion à la base.");
-    await pool.end(); // Use await for proper async close
+    pool.end();
   }
 });
 
