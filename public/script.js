@@ -82,31 +82,39 @@ function showToast(message, type = "info", autoHide = true) {
     }
 }
 
-// Fonction utilitaire pour obtenir une valeur de champ
+// Fonction utilitaire pour obtenir une valeur de champ (corrigée pour gérer les valeurs vides et Choices.js)
 function getInputValue(selector, required = true) {
     const element = document.querySelector(selector);
-    if (!element && required) {
-        // Check if the selector corresponds to a Choices.js instance and add invalid class
-        if (selector === '#nationalitySelect' || selector === '#pays_residenceSelect' || selector === '#countryCode') {
-             const choicesWrapper = document.querySelector(`.choices[data-type="select-one"] [name="${selector.substring(1)}"]`)?.closest('.choices');
-             choicesWrapper?.classList.add('is-invalid');
-         } else if (element) { // Only show toast if element exists but value is empty
-        showToast(`Le champ ${selector} est obligatoire.`, "error");
-         } else {
-            // Element itself not found
-             console.warn(`Element with selector ${selector} not found for required check.`);
-         }
-        return null;
-    }
+    let value = null;
     if (element) {
-         // Remove invalid class if value is present
-         if (selector === '#nationalitySelect' || selector === '#pays_residenceSelect' || selector === '#countryCode') {
-             const choicesWrapper = document.querySelector(`.choices[data-type="select-one"] [name="${selector.substring(1)}"]`)?.closest('.choices');
-             choicesWrapper?.classList.remove('is-invalid');
-         }
-         return element.value.trim();
-     } 
-     return null;
+        value = element.value.trim();
+    }
+
+    // Déterminer l'élément cible pour le styling (natif ou Choices.js wrapper)
+    let target = element;
+    if (selector === '#nationalitySelect' || selector === '#pays_residenceSelect' || selector === '#countryCode') {
+        target = document.querySelector(`.choices[data-type="select-one"] [name="${selector.substring(1)}"]`)?.closest('.choices') || element;
+    }
+
+    if (required && !value) {
+        // Champ requis vide : ajouter classe invalid et logger
+        if (target) {
+            target.classList.add('is-invalid');
+        }
+        console.warn(`Champ requis vide : ${selector} (valeur: "${value}")`);
+        return null;
+    } else if (value) {
+        // Valeur présente : supprimer classe invalid
+        if (target) {
+            target.classList.remove('is-invalid');
+        }
+    }
+
+    if (!element && required) {
+        console.error(`Élément non trouvé : ${selector}`);
+    }
+
+    return value;
 }
 
 // --- Validation de la longueur du téléphone (Adaptée pour prefix fixe) ---
@@ -132,8 +140,6 @@ function validatePhoneNumber() {
     // Apply/remove error class based on validation to the container
     if (numberLength > 0 && !isValidLength) {
         phoneGroup.classList.add('is-invalid'); // Add class to the group
-        // Optionally show toast (can be repetitive on input)
-        // showToast(`La longueur du numéro pour ${selectedOption.text.split('(')[0].trim()} doit être entre ${minLength} et ${maxLength} chiffres.`, "warning");
     } else {
         phoneGroup.classList.remove('is-invalid'); // Remove class from the group
     }
@@ -152,22 +158,14 @@ document.getElementById("registrationForm")?.addEventListener("submit", async (e
         document.querySelectorAll("#generalFormationsContainer .row-checkbox:checked")
     ).map(el => el.closest(".dropdown-item").querySelector(".item-label")?.textContent.trim() || "");
 
-/*     const selectedConferences = Array.from(
-        document.querySelectorAll("#conferenceContainer .row-checkbox:checked")
-    ).map(el => {
-        const itemLabel = el.closest(".dropdown-item").querySelector(".item-label");
-        if (!itemLabel) return null;
-        // Reconstruire l'objet conférence à partir des spans
-        const theme = itemLabel.querySelector('.field-theme')?.textContent.trim();
-        const speaker = itemLabel.querySelector('.field-speaker')?.textContent.trim();
-        const date = itemLabel.querySelector('.field-date')?.textContent.trim();
-        return { theme, speaker, date }; // Retourner null si un champ manque?
-    }).filter(conf => conf && conf.theme); // Filtrer les potentiels nulls ou incomplets
- */
-    // Get values directly from select elements
+    // Get values directly from select elements (getInputValue gère maintenant les classes invalid)
     const selectedNationality = getInputValue("#nationalitySelect");
     const selectedResidence = getInputValue("#pays_residenceSelect");
     const selectedCountryCode = getInputValue("#countryCode");
+
+    console.log("DEBUG - selectedCountryCode:", selectedCountryCode); // Log pour debug
+    console.log("DEBUG - selectedNationality:", selectedNationality);
+    console.log("DEBUG - selectedResidence:", selectedResidence);
 
     // Perform validation before gathering formData?
     const isPhoneValid = validatePhoneNumber(); // Call validation
@@ -180,7 +178,7 @@ document.getElementById("registrationForm")?.addEventListener("submit", async (e
         sexe: getInputValue("select[name='sexe']"),
         date_naissance: getInputValue("input[name='birthday']"),
         experience_years: getInputValue("select[name='experience_years']"),
-        organisation: getInputValue("input[name='organisation']"),
+        organisation: getInputValue("input[name='organisation']"), // Optional in DB, but required in form
         statut_fonction: getInputValue("input[name='statut']"),
         nationalite: selectedNationality,
         pays_residence: selectedResidence,
@@ -190,34 +188,26 @@ document.getElementById("registrationForm")?.addEventListener("submit", async (e
         indicatif_pays: selectedCountryCode, // The selected prefix (+33 etc)
     };
 
-    // Validation des champs requis
+    console.log("DEBUG - formData.indicatif_pays:", formData.indicatif_pays); // Log supplémentaire
+
+    // Validation des champs requis (getInputValue a déjà géré les classes invalid)
     let isValid = true; 
     let errorMessages = [];
 
-    // Basic check for required fields using getInputValue logic (which handles toast)
+    // Basic check for required fields
     if (!formData.nom) { isValid = false; errorMessages.push("Nom"); }
     if (!formData.prenom) { isValid = false; errorMessages.push("Prénom"); }
     if (!formData.email) { isValid = false; errorMessages.push("Email"); }
-    if (!formData.tel) { isValid = false; errorMessages.push("Téléphone"); document.getElementById('telInput')?.classList.add('is-invalid');}
-    else { document.getElementById('telInput')?.classList.remove('is-invalid'); } // Remove error if present
-    if (!formData.sexe) { isValid = false; errorMessages.push("Sexe"); document.getElementById('sexe')?.classList.add('is-invalid');}
-    else { document.getElementById('sexe')?.classList.remove('is-invalid'); }
-    if (!formData.date_naissance) { isValid = false; errorMessages.push("Date de naissance"); document.getElementById('birthday')?.classList.add('is-invalid');}
-    else { document.getElementById('birthday')?.classList.remove('is-invalid'); }
-    if (!formData.experience_years) { isValid = false; errorMessages.push("Années d'expérience"); document.getElementById('experience_years')?.classList.add('is-invalid');}
-    else { document.getElementById('experience_years')?.classList.remove('is-invalid'); }
-    if (!formData.organisation) { isValid = false; errorMessages.push("Organisation"); document.getElementById('organisation')?.classList.add('is-invalid');}
-    else { document.getElementById('organisation')?.classList.remove('is-invalid'); }
-    if (!formData.statut_fonction) { isValid = false; errorMessages.push("Fonction"); document.getElementById('statut')?.classList.add('is-invalid');}
-    else { document.getElementById('statut')?.classList.remove('is-invalid'); }
-    if (!formData.nationalite) { isValid = false; errorMessages.push("Nationalité"); document.getElementById('nationalitySelect')?.classList.add('is-invalid'); }
-    else { document.getElementById('nationalitySelect')?.classList.remove('is-invalid'); }
-    if (!formData.pays_residence) { isValid = false; errorMessages.push("Pays de résidence"); document.getElementById('pays_residenceSelect')?.classList.add('is-invalid'); }
-    else { document.getElementById('pays_residenceSelect')?.classList.remove('is-invalid'); }
-    if (!formData.langue_parlee) { isValid = false; errorMessages.push("Langue"); document.getElementById('langue')?.classList.add('is-invalid');}
-    else { document.getElementById('langue')?.classList.remove('is-invalid'); }
-    if (!formData.indicatif_pays) { isValid = false; errorMessages.push("Indicatif Pays"); document.getElementById('countryCode')?.classList.add('is-invalid'); }
-    else { document.getElementById('countryCode')?.classList.remove('is-invalid'); }
+    if (!formData.tel) { isValid = false; errorMessages.push("Téléphone"); }
+    if (!formData.sexe) { isValid = false; errorMessages.push("Sexe"); }
+    if (!formData.date_naissance) { isValid = false; errorMessages.push("Date de naissance"); }
+    if (!formData.experience_years) { isValid = false; errorMessages.push("Années d'expérience"); }
+    if (!formData.organisation) { isValid = false; errorMessages.push("Organisation"); }
+    if (!formData.statut_fonction) { isValid = false; errorMessages.push("Fonction"); }
+    if (!formData.nationalite) { isValid = false; errorMessages.push("Nationalité"); }
+    if (!formData.pays_residence) { isValid = false; errorMessages.push("Pays de résidence"); }
+    if (!formData.langue_parlee) { isValid = false; errorMessages.push("Langue"); }
+    if (!formData.indicatif_pays) { isValid = false; errorMessages.push("Indicatif Pays"); }
 
     // Check dropdowns (assuming required)
     if (selectedFormations.length === 0) { 
@@ -227,24 +217,16 @@ document.getElementById("registrationForm")?.addEventListener("submit", async (e
     } else {
         document.querySelector('#generalFormationsContainer')?.closest('.dropdown-container').querySelector('.dropdown-title').classList.remove('is-invalid');
     }
-/*     if (selectedConferences.length === 0) { 
-        isValid = false; 
-        errorMessages.push("Conférence"); 
-        document.querySelector('#conferenceContainer')?.closest('.dropdown-container').querySelector('.dropdown-title').classList.add('is-invalid');
-    } else {
-        document.querySelector('#conferenceContainer')?.closest('.dropdown-container').querySelector('.dropdown-title').classList.remove('is-invalid');
-    } */
 
     // Check phone validity explicitly
     if (!isPhoneValid) {
         isValid = false;
         // Error message/highlighting is handled within validatePhoneNumber
-        // Optionally, ensure toast is shown on submit if invalid
-         if (!formData.tel) { // Also check if empty
-            showToast("Le champ Téléphone est obligatoire.", "error");
-        } else {
-            showToast("Le numéro de téléphone n'a pas la longueur requise.", "error");
-        }
+        if (!formData.tel) { // Also check if empty
+           showToast("Le champ Téléphone est obligatoire.", "error");
+       } else {
+           showToast("Le numéro de téléphone n'a pas la longueur requise.", "error");
+       }
     }
     
     // Check if the number input itself is empty (getInputValue handles other fields)
@@ -255,7 +237,7 @@ document.getElementById("registrationForm")?.addEventListener("submit", async (e
     }
     
     if (!isValid) {
-        showToast(`Veuillez corriger les champs obligatoires ou invalides.`, "error");
+        showToast(`Veuillez corriger les champs obligatoires ou invalides : ${errorMessages.join(', ')}`, "error");
         toggleLoader(false);
         toggleButtonState(false);
         return;
@@ -397,12 +379,15 @@ async function populateSelects() {
          if (cameroonOptionValue) {
              countrySelect.value = cameroonOptionValue;
              phonePrefixSpan.textContent = cameroonOptionValue;
+             console.log("DEBUG - Default set to Cameroun:", cameroonOptionValue); // Log pour debug
          } else if (options.length > 1) {
              // Select the first actual country if Cameroon not found
              countrySelect.value = options[1].value; // options[0] is the placeholder
              phonePrefixSpan.textContent = options[1].value;
+             console.log("DEBUG - Default set to first option:", options[1].value);
          } else {
              phonePrefixSpan.textContent = "N/A";
+             console.log("DEBUG - No options available for default");
          }
 
     } catch (error) {
